@@ -100,11 +100,27 @@ main = Blueprint('main', __name__)
 
 import pickle
 
-with open("nlp_model.pkl", "rb") as f:
-    nlp_model = pickle.load(f)
+nlp_model = None
+vectorizer = None
 
-with open("vectorizer.pkl", "rb") as f:
-    vectorizer = pickle.load(f)
+def get_nlp_model():
+    global nlp_model
+
+    if nlp_model is None:
+        with open("nlp_model.pkl", "rb") as f:
+            nlp_model = pickle.load(f)
+
+    return nlp_model
+
+
+def get_vectorizer():
+    global vectorizer
+
+    if vectorizer is None:
+        with open("vectorizer.pkl", "rb") as f:
+            vectorizer = pickle.load(f)
+
+    return vectorizer
 
 # ---------------- REGISTER ----------------
 @main.route('/register', methods=['POST'])
@@ -234,11 +250,15 @@ def analyze_combined():
         # TEXT PREDICTION
         # =========================
 
-        x = vectorizer.transform([text])
+        model = get_nlp_model()
+        vec = get_vectorizer()
 
-        text_prediction = nlp_model.predict(x)[0]
+        x = vec.transform([text])
 
-        text_probs = nlp_model.predict_proba(x)[0]
+        text_prediction = model.predict(x)[0]
+
+        text_probs = model.predict_proba(x)[0]
+        # text_probs = nlp_model.predict_proba(x)[0]
 
         text_confidence = float(np.max(text_probs) * 100)
 
@@ -475,12 +495,14 @@ def analyze_text():
         }), 400
     
  
+    model = get_nlp_model()
+    vec = get_vectorizer()
 
-    x = vectorizer.transform([text])
+    x = vec.transform([text])
 
-    prediction = nlp_model.predict(x)[0]
+    prediction = model.predict(x)[0]
 
-    probs = nlp_model.predict_proba(x)[0]
+    probs = model.predict_proba(x)[0]
 
     confidence = float(np.max(probs) * 100)
 
