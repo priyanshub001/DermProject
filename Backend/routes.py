@@ -566,11 +566,7 @@ def analyze_image():
 
     try:
 
-        print("IMAGE STEP 1")
-
         image = Image.open(file).convert("RGB")
-
-        print("IMAGE STEP 2")
 
         transform = transforms.Compose([
             transforms.Resize((384, 384)),
@@ -583,17 +579,10 @@ def analyze_image():
 
         image_tensor = transform(image).unsqueeze(0)
 
-        print("IMAGE STEP 3")
-
         with torch.no_grad():
-
             model = get_image_model()
-
-            print("IMAGE STEP 4")
-
             outputs = model(image_tensor)
-
-            print("IMAGE STEP 5")
+            # outputs = image_model(image_tensor)
 
             probs = torch.softmax(outputs, dim=1)
 
@@ -601,11 +590,23 @@ def analyze_image():
 
             class_index = int(torch.argmax(probs).item())
 
-        print("IMAGE STEP 6")
-
         prediction = classes[class_index]
 
-        # severity logic ...
+        if prediction in [
+            "Melanoma",
+            "Basal Cell Carcinoma (BCC)"
+        ]:
+            severity = "High"
+
+        elif prediction in [
+            "Psoriasis pictures Lichen Planus and related diseases",
+            "Atopic Dermatitis",
+            "Tinea Ringworm Candidiasis and other Fungal Infections"
+        ]:
+            severity = "Medium"
+
+        else:
+            severity = "Low"
 
         return jsonify({
             "prediction": prediction,
@@ -618,9 +619,6 @@ def analyze_image():
         })
 
     except Exception as e:
-
-        print("IMAGE ERROR:", str(e))
-
         return jsonify({
             "error": str(e)
         }), 500
