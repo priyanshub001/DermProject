@@ -485,54 +485,74 @@ ADVICE = {
 @jwt_required()
 def analyze_text():
 
-    data = request.get_json()
+    try:
 
-    text = data.get("text", "").strip()
+        data = request.get_json()
 
-    if not text:
+        text = data.get("text", "").strip()
+
+        if not text:
+            return jsonify({
+                "error": "Text is required"
+            }), 400
+
+        print("STEP 1")
+
+        model = get_nlp_model()
+
+        print("STEP 2")
+
+        vec = get_vectorizer()
+
+        print("STEP 3")
+
+        x = vec.transform([text])
+
+        print("STEP 4")
+
+        prediction = model.predict(x)[0]
+
+        print("STEP 5")
+
+        probs = model.predict_proba(x)[0]
+
+        print("STEP 6")
+
+        confidence = float(np.max(probs) * 100)
+
+        if prediction in [
+            "Melanoma",
+            "Basal Cell Carcinoma (BCC)"
+        ]:
+            severity = "High"
+
+        elif prediction in [
+            "Psoriasis pictures Lichen Planus and related diseases",
+            "Atopic Dermatitis",
+            "Tinea Ringworm Candidiasis and other Fungal Infections"
+        ]:
+            severity = "Medium"
+
+        else:
+            severity = "Low"
+
         return jsonify({
-            "error": "Text is required"
-        }), 400
-    
- 
-    model = get_nlp_model()
-    vec = get_vectorizer()
+            "prediction": prediction,
+            "confidence": round(confidence, 2),
+            "severity": severity,
+            "advice": ADVICE.get(
+                prediction,
+                "Consult a dermatologist."
+            )
+        }), 200
 
-    x = vec.transform([text])
+    except Exception as e:
 
-    prediction = model.predict(x)[0]
+        print("ANALYZE TEXT ERROR:", str(e))
 
-    probs = model.predict_proba(x)[0]
-
-    confidence = float(np.max(probs) * 100)
-
-    if prediction in [
-    "Melanoma",
-    "Basal Cell Carcinoma (BCC)"
-]:
-        severity = "High"
-
-    elif prediction in [
-    "Psoriasis pictures Lichen Planus and related diseases",
-    "Atopic Dermatitis",
-    "Tinea Ringworm Candidiasis and other Fungal Infections"
-]:
-     severity = "Medium"
-
-    else:
-        severity = "Low"
-
-
-    return jsonify({
-    "prediction": prediction,
-    "confidence": round(confidence, 2),
-    "severity": severity,
-    "advice": ADVICE.get(
-        prediction,
-        "Consult a dermatologist."
-    )
-}), 200
-
+        return jsonify({
+            "error": str(e)
+        }), 500
 
 #----------------------for image-------------------
 @main.route('/analyze-image', methods=['POST'])
