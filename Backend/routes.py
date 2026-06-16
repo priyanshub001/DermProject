@@ -198,24 +198,26 @@ def google_login():
 @jwt_required()
 def analyze_combined():
 
-    text = request.form.get("text", "").strip()
-
-    if not text:
-        return jsonify({
-            "error": "Text is required"
-        }), 400
-
-    if 'image' not in request.files:
-        return jsonify({
-            "error": "Image is required"
-        }), 400
-
-    file = request.files['image']
-
     try:
 
+        print("COMBINED STEP 1")
+
+        text = request.form.get("text", "").strip()
+
+        if not text:
+            return jsonify({"error": "Text is required"}), 400
+
+        print("COMBINED STEP 2")
+
+        if 'image' not in request.files:
+            return jsonify({"error": "Image is required"}), 400
+
+        file = request.files['image']
+
+        print("COMBINED STEP 3")
+
         # =========================
-        # IMAGE PREDICTION
+        # IMAGE
         # =========================
 
         image = Image.open(file).convert("RGB")
@@ -231,12 +233,17 @@ def analyze_combined():
 
         image_tensor = transform(image).unsqueeze(0)
 
+        print("COMBINED STEP 4")
+
         with torch.no_grad():
 
-            model = get_image_model()
-            outputs = model(image_tensor)
+            image_model = get_image_model()
 
-            # outputs = image_model(image_tensor)
+            print("COMBINED STEP 5")
+
+            outputs = image_model(image_tensor)
+
+            print("COMBINED STEP 6")
 
             probs = torch.softmax(outputs, dim=1)
 
@@ -246,21 +253,31 @@ def analyze_combined():
 
         image_prediction = classes[img_index]
 
+        print("COMBINED STEP 7")
+
         # =========================
-        # TEXT PREDICTION
+        # TEXT
         # =========================
 
-        model = get_nlp_model()
-        vec = get_vectorizer()
+        nlp_model = get_nlp_model()
 
-        x = vec.transform([text])
+        print("COMBINED STEP 8")
 
-        text_prediction = model.predict(x)[0]
+        vectorizer = get_vectorizer()
 
-        text_probs = model.predict_proba(x)[0]
-        # text_probs = nlp_model.predict_proba(x)[0]
+        print("COMBINED STEP 9")
+
+        x = vectorizer.transform([text])
+
+        print("COMBINED STEP 10")
+
+        text_prediction = nlp_model.predict(x)[0]
+
+        text_probs = nlp_model.predict_proba(x)[0]
 
         text_confidence = float(np.max(text_probs) * 100)
+
+        print("COMBINED STEP 11")
 
         # =========================
         # FINAL DECISION
@@ -278,18 +295,13 @@ def analyze_combined():
         else:
 
             if img_confidence >= text_confidence:
-
                 final_prediction = image_prediction
                 final_confidence = img_confidence
-
             else:
-
                 final_prediction = text_prediction
                 final_confidence = text_confidence
 
-        # =========================
-        # SEVERITY
-        # =========================
+        print("COMBINED STEP 12")
 
         if final_prediction in [
             "Melanoma",
@@ -307,36 +319,29 @@ def analyze_combined():
         else:
             severity = "Low"
 
-        # =========================
-        # RESPONSE
-        # =========================
+        print("COMBINED STEP 13")
 
         return jsonify({
-
             "final_prediction": final_prediction,
             "final_confidence": round(final_confidence, 2),
-
             "image_prediction": image_prediction,
             "image_confidence": round(img_confidence, 2),
-
             "text_prediction": text_prediction,
             "text_confidence": round(text_confidence, 2),
-
             "severity": severity,
-
             "advice": ADVICE.get(
                 final_prediction,
                 "Consult a dermatologist."
             )
-
         }), 200
 
     except Exception as e:
 
+        print("COMBINED ERROR:", str(e))
+
         return jsonify({
             "error": str(e)
         }), 500
-
 
 # ---------------- SAVE SCAN ----------------
 @main.route('/save-scan', methods=['POST'])
