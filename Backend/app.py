@@ -6,9 +6,7 @@ def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
 
-    if not app.config.get("MONGO_URI"):
-        raise ValueError("MONGO_URI not found. Check your .env file!")
-
+   
     mongo.init_app(app)
     bcrypt.init_app(app)
     jwt.init_app(app)
