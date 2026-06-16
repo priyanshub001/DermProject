@@ -13,6 +13,11 @@ import timm
 import torch.nn as nn
 
 
+image_model = None
+nlp_model = None
+vectorizer = None
+
+
 
 class DermNetClassifier(nn.Module):
 
@@ -55,27 +60,34 @@ class DermNetClassifier(nn.Module):
 
 NUM_CLASSES = 10
 
-image_model = DermNetClassifier(
-    num_classes=NUM_CLASSES,
-    dropout=0.4
-)
+image_model = None
 
-checkpoint = torch.load(
-    "best_model.pth",
-    map_location="cpu"
-)
+def get_image_model():
+    global image_model
 
-# image_model.load_state_dict(
-#     checkpoint["state_dict"]
-# )
+    if image_model is None:
 
-# image_model.eval()
+        model = DermNetClassifier(
+            num_classes=NUM_CLASSES,
+            dropout=0.4
+        )
 
+        checkpoint = torch.load(
+            "best_model.pth",
+            map_location="cpu"
+        )
 
+        model.load_state_dict(
+            checkpoint["state_dict"]
+        )
 
-image_model.load_state_dict(checkpoint["state_dict"])
-image_model.eval()
-print("Model Loaded Successfully")
+        model.eval()
+
+        image_model = model
+
+        print("Model Loaded Successfully")
+
+    return image_model
 
 with open("classes.txt", "r") as f:
     classes = [
@@ -205,7 +217,10 @@ def analyze_combined():
 
         with torch.no_grad():
 
-            outputs = image_model(image_tensor)
+            model = get_image_model()
+            outputs = model(image_tensor)
+
+            # outputs = image_model(image_tensor)
 
             probs = torch.softmax(outputs, dim=1)
 
@@ -523,7 +538,9 @@ def analyze_image():
         image_tensor = transform(image).unsqueeze(0)
 
         with torch.no_grad():
-            outputs = image_model(image_tensor)
+            model = get_image_model()
+            outputs = model(image_tensor)
+            # outputs = image_model(image_tensor)
 
             probs = torch.softmax(outputs, dim=1)
 
