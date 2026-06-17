@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "332501243868",
+    "project_id": "dermsight",
+    "storage_bucket": "dermsight.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:332501243868:android:bc4b5c3fd0ce06a7372119",
+        "android_client_info": {
+          "package_name": "com.example.projectdermsight"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "332501243868-cb2tj1r1vmuopj7fpek6krrg0elsr12l.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.projectdermsight",
+            "certificate_hash": "b5ccf392261854c0e59dc555e289fd890af571df"
+          }
+        },
+        {
+          "client_id": "332501243868-82al3v4qfh6smfc3cag72j5o3neqjfaf.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB3G-UpKyX1UJ0iuTtMQwAIkZGLTZ7WHz8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "332501243868-82al3v4qfh6smfc3cag72j5o3neqjfaf.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
