@@ -18,6 +18,11 @@ migrate_working_dir/
 *.iws
 .idea/
 
+
+android/app/google-services.json
+ios/Runner/GoogleService-Info.plist
+.env
+
 # The .vscode folder contains launch configuration and tasks you configure in
 # VS Code which you may wish to be included in version control, so this line
 # is commented out by default.
