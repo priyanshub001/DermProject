@@ -354,6 +354,8 @@ def save_scan():
     mongo.db.scans.insert_one({
     "user_id": user_id,
 
+    "type": data.get("type"), 
+
     "text": data.get("text"),
     "image": data.get("image"),
 
