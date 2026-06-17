@@ -387,6 +387,7 @@ def history():
         {"user_id": user_id},
        {
     "_id": 0,
+     "type": 1, 
 
     "text": 1,
     "image": 1,
