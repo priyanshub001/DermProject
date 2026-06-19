@@ -393,26 +393,6 @@ User
 - 🛰 Telemedicine Integration
 - 📤 PDF Medical Report Export
 
----
-
-# 📸 Screenshots
-
-> Add screenshots of your application here.
-
-```
-Home Screen
-
-Prediction Screen
-
-Medical Report
-
-Profile Screen
-
-History Screen
-```
-
----
-
 # 🔒 Security
 
 - Secure Authentication
